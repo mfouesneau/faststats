@@ -1,0 +1,650 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>faststats Package &mdash; faststats  documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="faststats  documentation" href="index.html" />
+    <link rel="prev" title="Welcome to faststats’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to faststats’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">faststats  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="faststats-package">
+<h1>faststats Package<a class="headerlink" href="#faststats-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-faststats.distrib">
+<span id="distrib-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">distrib</span></tt> Module<a class="headerlink" href="#module-faststats.distrib" title="Permalink to this headline">¶</a></h2>
+<p>Class Distribution</p>
+<p>This class implements a distribution object that is defined by its pdf
+(probability density function)</p>
+<p>Interestingly, I could not find in numpy/scipy a class that could implement a
+distribution just from its pdf.  The idea of such object is to be able to
+compute statistics of this distribution without any pain.</p>
+<p>Also this class implements basic operations such as + - / <a href="#id1"><span class="problematic" id="id2">*</span></a>, with scalars or
+distributions, which comes handy when doing probabilities.  The normalization
+is left to the user&#8217;s decision but can be quickly done using the normalize()
+method</p>
+<p>Note that operations with scalars requires to write the distribution on the
+left side of the operators.</p>
+<p>Implementation notes:</p>
+<blockquote>
+<div><ul class="simple">
+<li>the pdf is given by a linear interpolation of the samples,</li>
+<li>the pdf&#8217;s norm is given by a scipy.integrate.simps integration (fast and robust)</li>
+<li>the cdf is given by the linear interpolation of the cumulative sum of the pdf samples.</li>
+<li>percentiles are calculated directly by bracketing the cdf and from linear interpolations</li>
+</ul>
+</div></blockquote>
+<dl class="class">
+<dt id="faststats.distrib.Distribution">
+<em class="property">class </em><tt class="descclassname">faststats.distrib.</tt><tt class="descname">Distribution</tt><big>(</big><em>x</em>, <em>pdf</em>, <em>name=None</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/faststats/distrib.html#Distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="faststats.distrib.Distribution.cdf">
+<tt class="descname">cdf</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.cdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cumulative distribution function</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="faststats.distrib.Distribution.isf">
+<tt class="descname">isf</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.isf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.isf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse survival function (Complementary CDF inverse)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="faststats.distrib.Distribution.kurtosis">
+<tt class="descname">kurtosis</tt><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.kurtosis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.kurtosis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="faststats.distrib.Distribution.mean">
+<tt class="descname">mean</tt><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="faststats.distrib.Distribution.moment">
+<tt class="descname">moment</tt><big>(</big><em>order</em>, <em>reduced=False</em><big>)</big><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.moment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.moment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Non-central moments</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="faststats.distrib.Distribution.normalize">
+<tt class="descname">normalize</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize the sampled pdf by its norm</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="faststats.distrib.Distribution.pdf">
+<tt class="descname">pdf</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Probability density function</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="faststats.distrib.Distribution.ppf">
+<tt class="descname">ppf</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.ppf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Percentile point function (i.e. CDF inverse)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="faststats.distrib.Distribution.rvs">
+<tt class="descname">rvs</tt><big>(</big><em>N</em><big>)</big><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.rvs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.rvs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Random samples</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="faststats.distrib.Distribution.sf">
+<tt class="descname">sf</tt><big>(</big><em>x</em><big>)</big><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.sf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.sf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Survival function = complementary CDF</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="faststats.distrib.Distribution.skew">
+<tt class="descname">skew</tt><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.skew"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.skew" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="faststats.distrib.Distribution.std">
+<tt class="descname">std</tt><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="faststats.distrib.Distribution.variance">
+<tt class="descname">variance</tt><a class="reference internal" href="_modules/faststats/distrib.html#Distribution.variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.Distribution.variance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="faststats.distrib.main">
+<tt class="descclassname">faststats.distrib.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/faststats/distrib.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.distrib.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test case: combining 4 experimental measurements</p>
+<p>Let&#8217;s have 4 independent measurements of the same quantity with Gaussian uncertainties.
+The measurements are samples of a given Gaussian distribution of which
+we want to estimate the mean and dispersion values</p>
+<p>A quick Bayesian inference (with uniform priors) will show that if all
+measurements are from the same distribution, the production of the 4
+posterior distributions will give you the underlying Gaussian
+parameters.</p>
+<dl class="docutils">
+<dt>if mu = {mk}, and sig = {sk} for k=1, N:</dt>
+<dd>p(m, s | mu, sig) ~ prod_k p(mk, sk | m, s) p(m, s)</dd>
+</dl>
+<p>We also find that the product of Gaussians is a Gaussian</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-faststats.fastkde">
+<span id="fastkde-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">fastkde</span></tt> Module<a class="headerlink" href="#module-faststats.fastkde" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="faststats.fastkde.fastkde">
+<tt class="descclassname">faststats.fastkde.</tt><tt class="descname">fastkde</tt><big>(</big><em>x</em>, <em>y</em>, <em>gridsize=(200</em>, <em>200)</em>, <em>extents=None</em>, <em>nocorrelation=False</em>, <em>weights=None</em>, <em>adjust=1.0</em><big>)</big><a class="reference internal" href="_modules/faststats/fastkde.html#fastkde"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.fastkde.fastkde" title="Permalink to this definition">¶</a></dt>
+<dd><p>A fft-based Gaussian kernel density estimate (KDE)
+for computing the KDE on a regular grid</p>
+<p>Note that this is a different use case than scipy&#8217;s original
+scipy.stats.kde.gaussian_kde</p>
+<p>Performs a gaussian kernel density estimate over a regular grid using a
+convolution of the gaussian kernel with a 2D histogram of the data.</p>
+<p>It computes the sparse bi-dimensional histogram of two data samples where
+<em>x</em>, and <em>y</em> are 1-D sequences of the same length. If <em>weights</em> is None
+(default), this is a histogram of the number of occurences of the
+observations at (x[i], y[i]).
+histogram of the data is a faster implementation than numpy.histogram as it
+avoids intermediate copies and excessive memory usage!</p>
+<p>This function is typically <em>several orders of magnitude faster</em> than
+scipy.stats.kde.gaussian_kde.  For large (&gt;1e7) numbers of points, it
+produces an essentially identical result.</p>
+<p>Boundary conditions on the data is corrected by using a symmetric /
+reflection condition. Hence the limits of the dataset does not affect the
+pdf estimate.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>x, y:  ndarray[ndim=1]</dt>
+<dd>The x-coords, y-coords of the input data points respectively</dd>
+<dt>gridsize: tuple</dt>
+<dd>A (nx,ny) tuple of the size of the output grid (default: 200x200)</dd>
+<dt>extents: (xmin, xmax, ymin, ymax) tuple</dt>
+<dd>tuple of the extents of output grid (default: extent of input data)</dd>
+<dt>nocorrelation: bool</dt>
+<dd>If True, the correlation between the x and y coords will be ignored
+when preforming the KDE. (default: False)</dd>
+<dt>weights: ndarray[ndim=1]</dt>
+<dd>An array of the same shape as x &amp; y that weights each sample (x_i,
+y_i) by each value in weights (w_i).  Defaults to an array of ones
+the same size as x &amp; y. (default: None)</dd>
+<dt>adjust <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>An adjustment factor for the bw. Bandwidth becomes bw * adjust.</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="docutils">
+<dt>g: ndarray[ndim=2]</dt>
+<dd>A gridded 2D kernel density estimate of the input points.</dd>
+<dt>e: (xmin, xmax, ymin, ymax) tuple</dt>
+<dd>Extents of g</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="faststats.fastkde.fastkde1D">
+<tt class="descclassname">faststats.fastkde.</tt><tt class="descname">fastkde1D</tt><big>(</big><em>xin</em>, <em>gridsize=200</em>, <em>extents=None</em>, <em>weights=None</em>, <em>adjust=1.0</em><big>)</big><a class="reference internal" href="_modules/faststats/fastkde.html#fastkde1D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.fastkde.fastkde1D" title="Permalink to this definition">¶</a></dt>
+<dd><p>A fft-based Gaussian kernel density estimate (KDE)
+for computing the KDE on a regular grid</p>
+<p>Note that this is a different use case than scipy&#8217;s original
+scipy.stats.kde.gaussian_kde</p>
+<p>Performs a gaussian kernel density estimate over a regular grid using a
+convolution of the gaussian kernel with a 2D histogram of the data.</p>
+<p>It computes the sparse bi-dimensional histogram of two data samples where
+<em>x</em>, and <em>y</em> are 1-D sequences of the same length. If <em>weights</em> is None
+(default), this is a histogram of the number of occurences of the
+observations at (x[i], y[i]).
+histogram of the data is a faster implementation than numpy.histogram as it
+avoids intermediate copies and excessive memory usage!</p>
+<p>This function is typically <em>several orders of magnitude faster</em> than
+scipy.stats.kde.gaussian_kde.  For large (&gt;1e7) numbers of points, it
+produces an essentially identical result.</p>
+<p><strong>Example usage and timing</strong></p>
+<blockquote>
+<div><p>from scipy.stats import gaussian_kde</p>
+<dl class="docutils">
+<dt>def npkde(x, xe):</dt>
+<dd>kde = gaussian_kde(x)
+r = kde.evaluate(xe)
+return r</dd>
+</dl>
+<p>x = np.random.normal(0, 1, 1e6)</p>
+<p>%timeit fastkde1D(x)
+10 loops, best of 3: 31.9 ms per loop</p>
+<p>%timeit npkde(x, xe)
+1 loops, best of 3: 11.8 s per loop</p>
+<p>~ 1e4 speed up!!! However gaussian_kde is not optimized for this application</p>
+</div></blockquote>
+<p>Boundary conditions on the data is corrected by using a symmetric /
+reflection condition. Hence the limits of the dataset does not affect the
+pdf estimate.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>xin:  ndarray[ndim=1]</dt>
+<dd>The x-coords, y-coords of the input data points respectively</dd>
+<dt>gridsize: int</dt>
+<dd>A nx integer of the size of the output grid (default: 200x200)</dd>
+<dt>extents: (xmin, xmax) tuple</dt>
+<dd>tuple of the extents of output grid (default: extent of input data)</dd>
+<dt>weights: ndarray[ndim=1]</dt>
+<dd>An array of the same shape as x that weights each sample x_i
+by w_i.  Defaults to an array of ones the same size as x (default: None)</dd>
+<dt>adjust <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd>An adjustment factor for the bw. Bandwidth becomes bw * adjust.</dd>
+</dl>
+</div></blockquote>
+<blockquote>
+<div><dl class="docutils">
+<dt>g: ndarray[ndim=2]</dt>
+<dd>A gridded 2D kernel density estimate of the input points.</dd>
+<dt>e: (xmin, xmax, ymin, ymax) tuple</dt>
+<dd>Extents of g</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-faststats.hist">
+<span id="hist-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">hist</span></tt> Module<a class="headerlink" href="#module-faststats.hist" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="faststats.hist.bayesian_blocks">
+<tt class="descclassname">faststats.hist.</tt><tt class="descname">bayesian_blocks</tt><big>(</big><em>t</em><big>)</big><a class="reference internal" href="_modules/faststats/hist.html#bayesian_blocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.hist.bayesian_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bayesian Blocks Implementation</p>
+<p>By Jake Vanderplas.  License: BSD
+Based on algorithm outlined in <a class="reference external" href="http://adsabs.harvard.edu/abs/2012arXiv1207.5578S">http://adsabs.harvard.edu/abs/2012arXiv1207.5578S</a></p>
+<dl class="docutils">
+<dt>t <span class="classifier-delimiter">:</span> <span class="classifier">ndarray, length N</span></dt>
+<dd>data to be histogrammed</dd>
+</dl>
+<dl class="docutils">
+<dt>bins <span class="classifier-delimiter">:</span> <span class="classifier">ndarray</span></dt>
+<dd>array containing the (N+1) bin edges</dd>
+</dl>
+<p>This is an incomplete implementation: it may fail for some
+datasets.  Alternate fitness functions and prior forms can
+be found in the paper listed above.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="faststats.hist.fast_histogram2d">
+<tt class="descclassname">faststats.hist.</tt><tt class="descname">fast_histogram2d</tt><big>(</big><em>x</em>, <em>y</em>, <em>bins=10</em>, <em>weights=None</em>, <em>reduce_w=None</em>, <em>NULL=None</em>, <em>reinterp=None</em><big>)</big><a class="reference internal" href="_modules/faststats/hist.html#fast_histogram2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.hist.fast_histogram2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the sparse bi-dimensional histogram of two data samples where <em>x</em>,
+and <em>y</em> are 1-D sequences of the same length. If <em>weights</em> is None
+(default), this is a histogram of the number of occurences of the
+observations at (x[i], y[i]).</p>
+<p>If <em>weights</em> is specified, it specifies values at the coordinate (x[i],
+y[i]). These values are accumulated for each bin and then reduced according
+to <em>reduce_w</em> function, which defaults to numpy&#8217;s sum function (np.sum).
+(If <em>weights</em> is specified, it must also be a 1-D sequence of the same
+length as <em>x</em> and <em>y</em>.)</p>
+<dl class="docutils">
+<dt>x: ndarray[ndim=1]</dt>
+<dd>first data sample coordinates</dd>
+<dt>y: ndarray[ndim=1]</dt>
+<dd>second data sample coordinates</dd>
+</dl>
+<dl class="docutils">
+<dt>bins: int or [int, int]</dt>
+<dd>int, the number of bins for the two dimensions (nx=ny=bins)
+or [int, int], the number of bins in each dimension (nx, ny = bins)</dd>
+<dt>weights: ndarray[ndim=1]</dt>
+<dd><dl class="first last docutils">
+<dt>values <em>w_i</em> weighing each sample <em>(x_i, y_i)</em></dt>
+<dd>accumulated and reduced (using reduced_w) per bin</dd>
+</dl>
+</dd>
+<dt>reduce_w: callable</dt>
+<dd>function that will reduce the <em>weights</em> values accumulated per bin
+defaults to numpy&#8217;s sum function (np.sum)</dd>
+<dt>NULL: value type</dt>
+<dd>filling missing data value</dd>
+<dt>reinterp: str</dt>
+<dd>values are [None, &#8216;nn&#8217;, linear&#8217;]
+if set, reinterpolation is made using mlab.griddata to fill missing
+data within the convex polygone that encloses the data</dd>
+</dl>
+<dl class="docutils">
+<dt>B: ndarray[ndim=2]</dt>
+<dd>bi-dimensional histogram</dd>
+<dt>extent: tuple(4)</dt>
+<dd>(xmin, xmax, ymin, ymax) extension of the histogram</dd>
+<dt>steps: tuple(2)</dt>
+<dd>(dx, dy) bin size in x and y direction</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="faststats.hist.optbins">
+<tt class="descclassname">faststats.hist.</tt><tt class="descname">optbins</tt><big>(</big><em>data</em>, <em>method='freedman'</em>, <em>ret='N'</em><big>)</big><a class="reference internal" href="_modules/faststats/hist.html#optbins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.hist.optbins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the optimal binning of the data based on common estimators
+and returns either the number of bins of the width to use.</p>
+<blockquote>
+<div>data    1d dataset to estimate from</div></blockquote>
+<blockquote>
+<div><p>method  the method to use: str in {sturge, scott, freedman}
+ret set to N will return the number of bins / edges</p>
+<blockquote>
+<div>set to W will return the width</div></blockquote>
+</div></blockquote>
+<ul>
+<li><p class="first">Sturges, H. A. (1926).&#8221;The choice of a class interval&#8221;. J. American Statistical Association, 65-66</p>
+</li>
+<li><p class="first">Scott, David W. (1979), &#8220;On optimal and data-based histograms&#8221;. Biometrika, 66, 605-610</p>
+</li>
+<li><dl class="first docutils">
+<dt>Freedman, D.; Diaconis, P. (1981). &#8220;On the histogram as a density estimator: L2 theory&#8221;.</dt>
+<dd><p class="first last">Zeitschrift fur Wahrscheinlichkeitstheorie und verwandte Gebiete, 57, 453-476</p>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="docutils">
+<dt><a href="#id3"><span class="problematic" id="id4">*</span></a>Scargle, J.D. et al (2012) &#8220;Studies in Astronomical Time Series Analysis. VI. Bayesian</dt>
+<dd>Block Representations.&#8221;</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="faststats.hist.quantiles">
+<tt class="descclassname">faststats.hist.</tt><tt class="descname">quantiles</tt><big>(</big><em>x, qlist=[2.5, 25, 50, 75, 97.5]</em><big>)</big><a class="reference internal" href="_modules/faststats/hist.html#quantiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.hist.quantiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes quantiles from an array</p>
+<p>Quantiles :=  points taken at regular intervals from the cumulative
+distribution function (CDF) of a random variable. Dividing ordered data
+into q essentially equal-sized data subsets is the motivation for
+q-quantiles; the quantiles are the data values marking the boundaries
+between consecutive subsets.</p>
+<p>The quantile with a fraction 50 is called the median
+(50% of the distribution)</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd>x     - variable to evaluate from
+qlist - quantiles fraction to estimate (in %)</dd>
+<dt>Outputs:</dt>
+<dd>Returns a dictionary of requested quantiles from array</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-faststats.plot">
+<span id="plot-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">plot</span></tt> Module<a class="headerlink" href="#module-faststats.plot" title="Permalink to this headline">¶</a></h2>
+<p>Variations on boxplots.</p>
+<dl class="function">
+<dt id="faststats.plot.violinplot">
+<tt class="descclassname">faststats.plot.</tt><tt class="descname">violinplot</tt><big>(</big><em>data</em>, <em>ax=None</em>, <em>labels=None</em>, <em>positions=None</em>, <em>side='both'</em>, <em>show_boxplot=True</em>, <em>plot_opts={}</em><big>)</big><a class="reference internal" href="_modules/faststats/plot.html#violinplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.plot.violinplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a violin plot of each dataset in the <cite>data</cite> sequence.</p>
+<p>A violin plot is a boxplot combined with a kernel density estimate of the
+probability density function per point.</p>
+<dl class="docutils">
+<dt>data <span class="classifier-delimiter">:</span> <span class="classifier">sequence of ndarrays</span></dt>
+<dd>Data arrays, one array per value in <cite>positions</cite>.</dd>
+<dt>ax <span class="classifier-delimiter">:</span> <span class="classifier">Matplotlib AxesSubplot instance, optional</span></dt>
+<dd>If given, this subplot is used to plot in instead of a new figure being
+created.</dd>
+<dt>labels <span class="classifier-delimiter">:</span> <span class="classifier">list of str, optional</span></dt>
+<dd>Tick labels for the horizontal axis.  If not given, integers
+<tt class="docutils literal"><span class="pre">1..len(data)</span></tt> are used.</dd>
+<dt>positions <span class="classifier-delimiter">:</span> <span class="classifier">array_like, optional</span></dt>
+<dd>Position array, used as the horizontal axis of the plot.  If not given,
+spacing of the violins will be equidistant.</dd>
+<dt>side <span class="classifier-delimiter">:</span> <span class="classifier">{&#8216;both&#8217;, &#8216;left&#8217;, &#8216;right&#8217;}, optional</span></dt>
+<dd>How to plot the violin.  Default is &#8216;both&#8217;.  The &#8216;left&#8217;, &#8216;right&#8217;
+options can be used to create asymmetric violin plots.</dd>
+<dt>show_boxplot <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd>Whether or not to show normal box plots on top of the violins.
+Default is True.</dd>
+<dt>plot_opts <span class="classifier-delimiter">:</span> <span class="classifier">dict, optional</span></dt>
+<dd><p class="first">A dictionary with plotting options.  Any of the following can be
+provided, if not present in <cite>plot_opts</cite> the defaults will be used:</p>
+<div class="last highlight-python"><pre>- 'violin_fc', MPL color.  Fill color for violins.  Default is 'y'.
+- 'violin_ec', MPL color.  Edge color for violins.  Default is 'k'.
+- 'violin_lw', scalar.  Edge linewidth for violins.  Default is 1.
+- 'violin_alpha', float.  Transparancy of violins.  Default is 0.5.
+- 'cutoff', bool.  If True, limit violin range to data range.
+      Default is False.
+- 'cutoff_val', scalar.  Where to cut off violins if `cutoff` is
+      True.  Default is 1.5 standard deviations.
+- 'cutoff_type', {'std', 'abs'}.  Whether cutoff value is absolute,
+      or in standard deviations.  Default is 'std'.
+- 'violin_width' : float.  Relative width of violins.  Max available
+      space is 1, default is 0.8.
+- 'label_fontsize', MPL fontsize.  Adjusts fontsize only if given.
+- 'label_rotation', scalar.  Adjusts label rotation only if given.
+      Specify in degrees.</pre>
+</div>
+</dd>
+</dl>
+<dl class="docutils">
+<dt>fig <span class="classifier-delimiter">:</span> <span class="classifier">Matplotlib figure instance</span></dt>
+<dd>If <cite>ax</cite> is None, the created figure.  Otherwise the figure to which
+<cite>ax</cite> is connected.</dd>
+</dl>
+<p>beanplot : Bean plot, builds on <cite>violinplot</cite>.
+matplotlib.pyplot.boxplot : Standard boxplot.</p>
+<p>The appearance of violins can be customized with <cite>plot_opts</cite>.  If
+customization of boxplot elements is required, set <cite>show_boxplot</cite> to False
+and plot it on top of the violins by calling the Matplotlib <cite>boxplot</cite>
+function directly.  For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">violinplot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show_boxplot</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sym</span><span class="o">=</span><span class="s">&#39;cv&#39;</span><span class="p">,</span> <span class="n">whis</span><span class="o">=</span><span class="mf">2.5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It can happen that the axis labels or tick labels fall outside the plot
+area, especially with rotated labels on the horizontal axis.  With
+Matplotlib 1.1 or higher, this can easily be fixed by calling
+<tt class="docutils literal"><span class="pre">ax.tight_layout()</span></tt>.  With older Matplotlib one has to use <tt class="docutils literal"><span class="pre">plt.rc</span></tt> or
+<tt class="docutils literal"><span class="pre">plt.rcParams</span></tt> to fix this, for example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s">&#39;figure.subplot&#39;</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="n">violinplot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>J.L. Hintze and R.D. Nelson, &#8220;Violin Plots: A Box Plot-Density Trace
+Synergism&#8221;, The American Statistician, Vol. 52, pp.181-84, 1998.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="faststats.plot.beanplot">
+<tt class="descclassname">faststats.plot.</tt><tt class="descname">beanplot</tt><big>(</big><em>data</em>, <em>ax=None</em>, <em>labels=None</em>, <em>positions=None</em>, <em>side='both'</em>, <em>jitter=False</em>, <em>plot_opts={}</em><big>)</big><a class="reference internal" href="_modules/faststats/plot.html#beanplot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.plot.beanplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a bean plot of each dataset in the <cite>data</cite> sequence.</p>
+<p>A bean plot is a combination of a <cite>violinplot</cite> (kernel density estimate of
+the probability density function per point) with a line-scatter plot of all
+individual data points.</p>
+<dl class="docutils">
+<dt>data <span class="classifier-delimiter">:</span> <span class="classifier">sequence of ndarrays</span></dt>
+<dd>Data arrays, one array per value in <cite>positions</cite>.</dd>
+<dt>ax <span class="classifier-delimiter">:</span> <span class="classifier">Matplotlib AxesSubplot instance, optional</span></dt>
+<dd>If given, this subplot is used to plot in instead of a new figure being
+created.</dd>
+<dt>labels <span class="classifier-delimiter">:</span> <span class="classifier">list of str, optional</span></dt>
+<dd>Tick labels for the horizontal axis.  If not given, integers
+<tt class="docutils literal"><span class="pre">1..len(data)</span></tt> are used.</dd>
+<dt>positions <span class="classifier-delimiter">:</span> <span class="classifier">array_like, optional</span></dt>
+<dd>Position array, used as the horizontal axis of the plot.  If not given,
+spacing of the violins will be equidistant.</dd>
+<dt>side <span class="classifier-delimiter">:</span> <span class="classifier">{&#8216;both&#8217;, &#8216;left&#8217;, &#8216;right&#8217;}, optional</span></dt>
+<dd>How to plot the violin.  Default is &#8216;both&#8217;.  The &#8216;left&#8217;, &#8216;right&#8217;
+options can be used to create asymmetric violin plots.</dd>
+<dt>jitter <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
+<dd>If True, jitter markers within violin instead of plotting regular lines
+around the center.  This can be useful if the data is very dense.</dd>
+<dt>plot_opts <span class="classifier-delimiter">:</span> <span class="classifier">dict, optional</span></dt>
+<dd><p class="first">A dictionary with plotting options.  All the options for <cite>violinplot</cite>
+can be specified, they will simply be passed to <cite>violinplot</cite>.  Options
+specific to <cite>beanplot</cite> are:</p>
+<blockquote class="last">
+<div><ul>
+<li><dl class="first docutils">
+<dt>&#8216;bean_color&#8217;, MPL color.  Color of bean plot lines.  Default is &#8216;k&#8217;.</dt>
+<dd><p class="first last">Also used for jitter marker edge color if <cite>jitter</cite> is True.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;bean_size&#8217;, scalar.  Line length as a fraction of maximum length.</dt>
+<dd><p class="first last">Default is 0.5.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">&#8216;bean_lw&#8217;, scalar.  Linewidth, default is 0.5.</p>
+</li>
+<li><p class="first">&#8216;bean_show_mean&#8217;, bool.  If True (default), show mean as a line.</p>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;bean_show_median&#8217;, bool.  If True (default), show median as a</dt>
+<dd><p class="first last">marker.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">&#8216;bean_mean_color&#8217;, MPL color.  Color of mean line.  Default is &#8216;b&#8217;.</p>
+</li>
+<li><p class="first">&#8216;bean_mean_lw&#8217;, scalar.  Linewidth of mean line, default is 2.</p>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;bean_median_color&#8217;, MPL color.  Color of median marker.  Default</dt>
+<dd><p class="first last">is &#8216;r&#8217;.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">&#8216;bean_median_marker&#8217;, MPL marker.  Marker type, default is &#8216;+&#8217;.</p>
+</li>
+<li><dl class="first docutils">
+<dt>&#8216;jitter_marker&#8217;, MPL marker.  Marker type for <tt class="docutils literal"><span class="pre">jitter=True</span></tt>.</dt>
+<dd><p class="first last">Default is &#8216;o&#8217;.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">&#8216;jitter_marker_size&#8217;, int.  Marker size.  Default is 4.</p>
+</li>
+<li><p class="first">&#8216;jitter_fc&#8217;, MPL color.  Jitter marker face color.  Default is None.</p>
+</li>
+<li><p class="first">&#8216;bean_legend_text&#8217;, str.  If given, add a legend with given text.</p>
+</li>
+</ul>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="docutils">
+<dt>fig <span class="classifier-delimiter">:</span> <span class="classifier">Matplotlib figure instance</span></dt>
+<dd>If <cite>ax</cite> is None, the created figure.  Otherwise the figure to which
+<cite>ax</cite> is connected.</dd>
+</dl>
+<p>violinplot : Violin plot, also used internally in <cite>beanplot</cite>.
+matplotlib.pyplot.boxplot : Standard boxplot.</p>
+<p>P. Kampstra, &#8220;Beanplot: A Boxplot Alternative for Visual Comparison of
+Distributions&#8221;, J. Stat. Soft., Vol. 28, pp. 1-9, 2008.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="faststats.plot.kde_plot">
+<tt class="descclassname">faststats.plot.</tt><tt class="descname">kde_plot</tt><big>(</big><em>x</em>, <em>ax=None</em>, <em>orientation='horizontal'</em>, <em>cutoff=False</em>, <em>log=False</em>, <em>cutoff_type='std'</em>, <em>cutoff_val=1.5</em>, <em>pos=100</em>, <em>pos_marker='line'</em>, <em>pos_width=0.05</em>, <em>pos_kwargs={}</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/faststats/plot.html#kde_plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#faststats.plot.kde_plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">faststats Package</a><ul>
+<li><a class="reference internal" href="#module-faststats.distrib"><tt class="docutils literal"><span class="pre">distrib</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-faststats.fastkde"><tt class="docutils literal"><span class="pre">fastkde</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-faststats.hist"><tt class="docutils literal"><span class="pre">hist</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-faststats.plot"><tt class="docutils literal"><span class="pre">plot</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to faststats&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/faststats.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to faststats’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">faststats  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Author.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
