@@ -29,6 +29,7 @@ def npkde(x, xe):
    return r
 
 x = np.random.normal(0, 1, 1e6)
+xe = np.linspace(0., 1., 256)
 
 %timeit fastkde1D(x)
 10 loops, best of 3: 31.9 ms per loop
