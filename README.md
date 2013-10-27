@@ -17,6 +17,8 @@ potentially crash your system.
 **Note**: algorithms in this package as usage targeted. This is how we can speed
 up the algorithms.
 
+API documentation: [here](http://mfouesneau.github.io/faststats/index.html)
+
 Quick example
 -------------
 
