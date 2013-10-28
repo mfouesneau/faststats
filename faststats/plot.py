@@ -127,7 +127,7 @@ def _single_violin(ax, pos, pos_data, width, side, plot_opts):
         cutoff_val = plot_opts.get('cutoff_val', 1.5)
 
         s = 0.0
-        if not cutoff:
+        if cutoff:
             if cutoff_type == 'std':
                 s = cutoff_val * np.std(pos_data)
             else:
