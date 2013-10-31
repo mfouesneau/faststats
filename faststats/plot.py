@@ -358,7 +358,7 @@ def kde_plot(x, ax=None, orientation='horizontal', cutoff=False, log=False, cuto
 
     # Create violin for pos, scaled to the available space.
     s = 0.0
-    if not cutoff:
+    if cutoff:
         if cutoff_type == 'std':
             s = cutoff_val * np.std(_data)
         else:
