@@ -428,3 +428,193 @@ def kde_plot(x, ax=None, orientation='horizontal', cutoff=False, log=False, cuto
     plt.draw_if_interactive()
 
     return xvals, violin
+
+
+def symmatplot(mat, p_mat=None, names=None, cmap="Greys", cmap_range=None,
+               cbar=True, annot=True, diag_names=True, ax=None, **kwargs):
+    """Plot a symmetric matrix with colormap and statistic values.
+
+    Parameters
+    ----------
+
+    mat : square array
+         square array of statistics.
+
+    p_mat: nobs x nvars array
+        Rectangular matrix of statistic uncertainties
+
+    names : sequence of strings
+        Names to associate with variables if `data` is not a named array.
+
+    cmap : colormap
+        Colormap name as string or colormap object.
+
+    cmap_range : None, "full", (low, high)
+        Either truncate colormap at (-max(abs(r)), max(abs(r))), use the
+        full range (-1, 1), or specify (min, max) values for the colormap.
+
+    cbar : bool
+        If true, plot the colorbar legend.
+
+    annot : bool
+        Whether to annotate the upper triangle with correlation coefficients.
+
+    diag_names: bool
+        if set, display variable names in the diagonal cells
+
+    ax : matplotlib axis
+        Axis to draw plot in.
+
+    kwargs : other keyword arguments
+        Passed to ax.matshow()
+
+    Returns
+    -------
+    ax : matplotlib axis
+        Axis object with plot.
+
+    """
+    if ax is None:
+        ax = plt.gca()
+
+    nvars = len(mat)
+    plotmat = mat.copy()
+    plotmat[np.triu_indices(nvars)] = np.nan
+
+    if cmap_range is None:
+        vmax = np.nanmax(plotmat) * 1.15
+        vmin = np.nanmin(plotmat) * 1.15
+    elif len(cmap_range) == 2:
+        vmin, vmax = cmap_range
+    else:
+        raise ValueError("cmap_range argument not understood")
+
+    mat_img = ax.matshow(plotmat, cmap=cmap, vmin=vmin, vmax=vmax, **kwargs)
+
+    if cbar:
+        plt.colorbar(mat_img, pad=0.01, shrink=0.90)
+
+    if annot:
+        for i, j in zip(*np.triu_indices(nvars, 1)):
+            val = mat[i, j]
+            ax.text(j, i, "%.2g" % (val), fontdict=dict(ha="center", va="center", size='small'))
+            if p_mat is not None:
+                ax.text(j, i + 0.2, "+/-%.2g" % (p_mat[i, j]), fontdict=dict(ha="center", va="center", size='xx-small'))
+    else:
+        fill = np.ones_like(plotmat)
+        fill[np.tril_indices_from(fill, -1)] = np.nan
+        ax.matshow(fill, cmap="Greys", vmin=0, vmax=0, zorder=2)
+
+    if names is None:
+        names = ["x %d" % i for i in range(nvars)]
+
+    if diag_names:
+        for i, name in enumerate(names):
+            ax.text(i, i, name, fontdict=dict(ha="center", va="center", weight="bold", rotation=45))
+        ax.set_xticklabels(())
+        ax.set_yticklabels(())
+    else:
+        ax.xaxis.set_ticks_position("bottom")
+        xnames = names if annot else names[:-1]
+        ax.set_xticklabels(xnames, rotation=90)
+        ynames = names if annot else names[1:]
+        ax.set_yticklabels(ynames)
+
+    minor_ticks = np.linspace(-.5, nvars - 1.5, nvars)
+    ax.set_xticks(minor_ticks, True)
+    ax.set_yticks(minor_ticks, True)
+    major_ticks = np.linspace(0, nvars - 1, nvars)
+    xticks = major_ticks if annot else major_ticks[:-1]
+    ax.set_xticks(xticks)
+    yticks = major_ticks if annot else major_ticks[1:]
+    ax.set_yticks(yticks)
+    ax.grid(False, which="major")
+    ax.grid(True, which="minor", linestyle="-")
+
+    return ax
+
+
+def corrplot(data, names=None, annot=True, sig_corr=True,
+             cmap=None, cmap_range=None, cbar=True,
+             diag_names=True, ax=None, **kwargs):
+    """Plot a correlation matrix with colormap and r values.
+
+    Parameters
+    ----------
+    data : nobs x nvars array
+        Rectangular input data with variabes in the columns.
+
+    names : sequence of strings
+        Names to associate with variables if `data` is not a named array.
+
+    annot : bool
+        Whether to annotate the upper triangle with correlation coefficients.
+
+    sig_corr : bool
+        If True, use FWE-corrected p values for the sig stars.
+
+    cmap : colormap
+        Colormap name as string or colormap object.
+
+    cmap_range : None, "full", (low, high)
+        Either truncate colormap at (-max(abs(r)), max(abs(r))), use the
+        full range (-1, 1), or specify (min, max) values for the colormap.
+
+    cbar : bool
+        If true, plot the colorbar legend.
+
+    ax : matplotlib axis
+        Axis to draw plot in.
+
+    kwargs : other keyword arguments
+        Passed to ax.matshow()
+
+    Returns
+    -------
+    ax : matplotlib axis
+        Axis object with plot.
+    """
+    if not hasattr(data, 'keys'):
+        names = names or ["x %d" % i for i in range(len(data))]
+    else:
+        names = names or data.keys()
+
+    # Calculate the correlation matrix of the dataframe
+    corrmat = np.corrcoef(data)
+
+    # Get p values with a permutation test
+    def _get_sig_cor(data, n=100):
+        _data = np.asarray(data)
+        N = len(data)
+        dk = np.asarray([ np.corrcoef(_data[np.random.randint(0, N, size=N), :]) for k in range(10) ])
+        #p16, p50, p84 = np.percentile(dk, [0.16, 0.5, 0.84], axis=0)
+        #return p16, p50, p84
+        return np.std(dk, axis=0)
+
+    if annot and sig_corr:
+        p_mat = _get_sig_cor(data)
+    else:
+        p_mat = None
+
+    # Sort out the color range
+    if cmap_range is None:
+        triu = np.triu_indices(len(corrmat), 1)
+        vmax = min(1, np.max(np.abs(corrmat[triu])) * 1.15)
+        vmin = -vmax
+        cmap_range = vmin, vmax
+    elif cmap_range == "full":
+        cmap_range = (-1, 1)
+
+    # Find a colormapping, somewhat intelligently
+    if cmap is None:
+        if min(cmap_range) >= 0:
+            cmap = "OrRd"
+        elif max(cmap_range) <= 0:
+            cmap = "PuBu_r"
+        else:
+            cmap = "coolwarm"
+
+    # Plot using the more general symmatplot function
+    ax = symmatplot(corrmat, p_mat, names, cmap, cmap_range, cbar, annot, diag_names, ax, **kwargs)
+
+    return ax
