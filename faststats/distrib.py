@@ -24,6 +24,7 @@ Implementation notes:
 """
 
 
+from __future__ import print_function
 import inspect
 import numpy as np
 from scipy.integrate import simps
@@ -311,7 +312,7 @@ def main():
     """
     import pylab as plt
 
-    #define a (normalized) gaussian probability distribution function
+    # define a (normalized) gaussian probability distribution function
     Normal = lambda x, m, s: 1. / np.sqrt(2. * np.pi * s ** 2) * np.exp(-0.5 * ((x - m) / s) ** 2 )
 
     x = np.arange(0, 6, 0.01)
@@ -323,15 +324,15 @@ def main():
     for k in yk[1:]:
         B *= k
 
-    print '{:6s} {:6s} {:6s}'.format(*'norm mean std'.split())
+    print('{:6s} {:6s} {:6s}'.format(*'norm mean std'.split()))
     for k in yk:
-        print '{y.norm:5.3g} {y.mean:5.3g} {y.std:5.3g}'.format(y=k)
+        print('{y.norm:5.3g} {y.mean:5.3g} {y.std:5.3g}'.format(y=k))
         plt.plot(x, k._pdf)
 
     plt.plot(x, B._pdf, lw=2, color='0.0')
 
-    print "final distribution:"
-    print "Expr: {B.name}\n stats: \n   mean = {B.mean},\n   std = {B.std},\n   skew = {B.skew},\n   kurtosis = {B.kurtosis}".format(B=B)
+    print("final distribution:")
+    print("Expr: {B.name}\n stats: \n   mean = {B.mean},\n   std = {B.std},\n   skew = {B.skew},\n   kurtosis = {B.kurtosis}".format(B=B))
 
 
 if __name__ == '__main__':

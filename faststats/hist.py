@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 from scipy import sparse
 from matplotlib.mlab import griddata
@@ -228,7 +229,7 @@ def optbins(data, method='freedman', ret='N'):
 
     def sturge():
         if (n <= 30):
-            print "Warning: Sturge estimator can perform poorly for small samples"
+            print("Warning: Sturge estimator can perform poorly for small samples")
         k = int(np.log(n) + 1)
         h = r / k
         return h, k
@@ -297,4 +298,4 @@ def quantiles(x, qlist=[2.5, 25, 50, 75, 97.5]):
         return dict(zip(qlist, quants))
 
     except IndexError:
-        print "Too few elements for quantile calculation"
+        print("Too few elements for quantile calculation")

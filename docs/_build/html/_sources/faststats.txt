@@ -1,6 +1,14 @@
 faststats Package
 =================
 
+:mod:`faststats` Package
+------------------------
+
+.. automodule:: faststats.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`distrib` Module
 ---------------------
 
