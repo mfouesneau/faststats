@@ -24,6 +24,7 @@ Implementation notes:
 """
 
 
+from __future__ import print_function
 import inspect
 import numpy as np
 from scipy.integrate import simps
@@ -311,7 +312,7 @@ def main():
     """
     import pylab as plt
 
-    #define a (normalized) gaussian probability distribution function
+    # define a (normalized) gaussian probability distribution function
     Normal = lambda x, m, s: 1. / np.sqrt(2. * np.pi * s ** 2) * np.exp(-0.5 * ((x - m) / s) ** 2 )
 
     x = np.arange(0, 6, 0.01)
