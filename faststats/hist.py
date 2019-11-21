@@ -4,7 +4,8 @@ from scipy import sparse
 from scipy.interpolate import griddata
 
 
-def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, reinterp=None):
+def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None,
+                     reinterp=None):
     """
     Compute the sparse bi-dimensional histogram of two data samples where *x*,
     and *y* are 1-D sequences of the same length. If *weights* is None
@@ -17,7 +18,7 @@ def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, rein
     (If *weights* is specified, it must also be a 1-D sequence of the same
     length as *x* and *y*.)
 
-    INPUTS
+    Parameters
     ------
     x: ndarray[ndim=1]
         first data sample coordinates
@@ -25,15 +26,14 @@ def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, rein
     y: ndarray[ndim=1]
         second data sample coordinates
 
-    KEYWORDS
-    --------
     bins: int or [int, int]
         int, the number of bins for the two dimensions (nx=ny=bins)
         or [int, int], the number of bins in each dimension (nx, ny = bins)
 
     weights: ndarray[ndim=1]
         values *w_i* weighing each sample *(x_i, y_i)*
-                                        accumulated and reduced (using reduced_w) per bin
+        accumulated and reduced (using reduced_w) per bin
+
     reduce_w: callable
         function that will reduce the *weights* values accumulated per bin
         defaults to numpy's sum function (np.sum)
@@ -43,10 +43,10 @@ def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, rein
 
     reinterp: str in {‘linear’, ‘nearest’, ‘cubic’}, optional
         Method of interpolation.
-        if set, reinterpolation is made using scipy.interpolate.griddata to fill missing
-        data within the convex polygone that encloses the data
+        if set, reinterpolation is made using scipy.interpolate.griddata to
+        fill missing data within the convex polygone that encloses the data
 
-    OUTPUTS
+    Returns
     -------
     B: ndarray[ndim=2]
         bi-dimensional histogram
@@ -57,13 +57,14 @@ def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, rein
     steps: tuple(2)
         (dx, dy) bin size in x and y direction
     """
-    # define the bins (do anything you want here but needs edges and sizes of the 2d bins)
+    # define the bins (do anything you want here but needs edges and sizes of
+    # the 2d bins)
     try:
         nx, ny = bins
     except TypeError:
         nx = ny = bins
 
-    #values you want to be reported
+    # values you want to be reported
     if weights is None:
         weights = np.ones(x.size)
 
@@ -93,7 +94,7 @@ def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, rein
     xyi /= [dx, dy]
     xyi = np.floor(xyi, xyi).T
 
-    #xyi contains the bins of each point as a 2d array [(xi,yi)]
+    # xyi contains the bins of each point as a 2d array [(xi,yi)]
 
     d = {}
     for e, k in enumerate(xyi.T):
@@ -104,16 +105,17 @@ def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, rein
         else:
             d[key] = [_w[e]]
 
-    _xyi = np.array(d.keys()).T
-    _w   = np.array([ reduce_w(v) for v in d.values() ])
+    _xyi = np.array(list(d.keys())).T
+    _w = np.array([reduce_w(v) for v in d.values()])
 
     # exploit a sparse coo_matrix to build the 2D histogram...
     _grid = sparse.coo_matrix((_w, _xyi), shape=(nx, ny))
 
     if reinterp is None:
-        #convert sparse to array with filled value
-        ## grid.toarray() does not account for filled value
-        ## sparse.coo.coo_todense() does actually add the values to the existing ones, i.e. not what we want -> brute force
+        # convert sparse to array with filled value
+        # grid.toarray() does not account for filled value
+        # sparse.coo.coo_todense() does actually add the values to the existing
+        # ones, i.e. not what we want -> brute force
         if NULL is None:
             B = _grid.toarray()
         else:  # Brute force only went needed
@@ -125,10 +127,12 @@ def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, rein
         xi = np.arange(nx, dtype=float)
         yi = np.arange(ny, dtype=float)
         # Old griddata from mlab
-        # B = griddata(_grid.col.astype(float), _grid.row.astype(float), _grid.data, xi, yi, interp=reinterp)
-        
-        B = griddata(np.array([_grid.col.astype(float), _grid.row.astype(float)]).T, 
-                     _grid.data, 
+        # B = griddata(_grid.col.astype(float), _grid.row.astype(float),
+        #              _grid.data, xi, yi, interp=reinterp)
+
+        B = griddata(np.array([_grid.col.astype(float),
+                               _grid.row.astype(float)]).T,
+                     _grid.data,
                      np.array([xi, yi]).T, interp=reinterp)
 
     return B, (xmin, xmax, ymin, ymax), (dx, dy)
@@ -138,7 +142,8 @@ def bayesian_blocks(t):
     """Bayesian Blocks Implementation
 
     By Jake Vanderplas.  License: BSD
-    Based on algorithm outlined in http://adsabs.harvard.edu/abs/2012arXiv1207.5578S
+    Based on algorithm outlined in
+    http://adsabs.harvard.edu/abs/2012arXiv1207.5578S
 
     Parameters
     ----------
@@ -169,9 +174,9 @@ def bayesian_blocks(t):
     best = np.zeros(N, dtype=float)
     last = np.zeros(N, dtype=int)
 
-    #-----------------------------------------------------------------
+    # -----------------------------------------------------------------
     # Start with first data cell; add one cell at each iteration
-    #-----------------------------------------------------------------
+    # -----------------------------------------------------------------
     for K in range(N):
         # Compute the width and count of the final bin for all possible
         # locations of the K^th changepoint
@@ -188,9 +193,9 @@ def bayesian_blocks(t):
         last[K] = i_max
         best[K] = fit_vec[i_max]
 
-    #-----------------------------------------------------------------
+    # -----------------------------------------------------------------
     # Recover changepoints by iteratively peeling off the last block
-    #-----------------------------------------------------------------
+    # -----------------------------------------------------------------
     change_points = np.zeros(N, dtype=int)
     i_cp = N
     ind = N
@@ -221,12 +226,15 @@ def optbins(data, method='freedman', ret='N'):
 
     refs
     ----
-    * Sturges, H. A. (1926)."The choice of a class interval". J. American Statistical Association, 65-66
-    * Scott, David W. (1979), "On optimal and data-based histograms". Biometrika, 66, 605-610
-    * Freedman, D.; Diaconis, P. (1981). "On the histogram as a density estimator: L2 theory".
-            Zeitschrift fur Wahrscheinlichkeitstheorie und verwandte Gebiete, 57, 453-476
-    *Scargle, J.D. et al (2012) "Studies in Astronomical Time Series Analysis. VI. Bayesian
-        Block Representations."
+    * Sturges, H. A. (1926)."The choice of a class interval". J. American
+      Statistical Association, 65-66
+    * Scott, David W. (1979), "On optimal and data-based histograms".
+      Biometrika, 66, 605-610
+    * Freedman, D.; Diaconis, P. (1981). "On the histogram as a density
+      estimator: L2 theory".  Zeitschrift fur Wahrscheinlichkeitstheorie und
+      verwandte Gebiete, 57, 453-476
+    * Scargle, J.D. et al (2012) "Studies in Astronomical Time Series Analysis.
+      VI. Bayesian Block Representations."
     """
     x = np.asarray(data)
     n = x.size
@@ -254,7 +262,8 @@ def optbins(data, method='freedman', ret='N'):
         r = bayesian_blocks(x)
         return np.diff(r), r
 
-    m = {'sturge':sturge, 'scott':scott, 'freedman': freedman, 'bayesian':bayesian}
+    m = {'sturge': sturge, 'scott': scott, 'freedman':  freedman,
+         'bayesian':  bayesian}
 
     if method.lower() in m:
         s = m[method.lower()]()
