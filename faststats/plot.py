@@ -3,7 +3,7 @@
 
 import numpy as np
 import pylab as plt
-import fastkde
+from . import fastkde
 
 
 __all__ = ['violinplot', 'beanplot', 'kde_plot']
