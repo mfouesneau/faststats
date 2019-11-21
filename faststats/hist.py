@@ -1,7 +1,7 @@
 from __future__ import print_function
 import numpy as np
 from scipy import sparse
-from matplotlib.mlab import griddata
+from scipy.interpolate import griddata
 
 
 def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, reinterp=None):
@@ -41,9 +41,9 @@ def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, rein
     NULL: value type
         filling missing data value
 
-    reinterp: str
-        values are [None, 'nn', linear']
-        if set, reinterpolation is made using mlab.griddata to fill missing
+    reinterp: str in {‘linear’, ‘nearest’, ‘cubic’}, optional
+        Method of interpolation.
+        if set, reinterpolation is made using scipy.interpolate.griddata to fill missing
         data within the convex polygone that encloses the data
 
     OUTPUTS
@@ -124,7 +124,12 @@ def fast_histogram2d(x, y, bins=10, weights=None, reduce_w=None, NULL=None, rein
     else:  # reinterp
         xi = np.arange(nx, dtype=float)
         yi = np.arange(ny, dtype=float)
-        B = griddata(_grid.col.astype(float), _grid.row.astype(float), _grid.data, xi, yi, interp=reinterp)
+        # Old griddata from mlab
+        # B = griddata(_grid.col.astype(float), _grid.row.astype(float), _grid.data, xi, yi, interp=reinterp)
+        
+        B = griddata(np.array([_grid.col.astype(float), _grid.row.astype(float)]).T, 
+                     _grid.data, 
+                     np.array([xi, yi]).T, interp=reinterp)
 
     return B, (xmin, xmax, ymin, ymax), (dx, dy)
 
