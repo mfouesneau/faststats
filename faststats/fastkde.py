@@ -3,7 +3,8 @@ from scipy.sparse import coo_matrix
 from scipy.signal import convolve2d, convolve, gaussian
 
 
-def fastkde(x, y, gridsize=(200, 200), extents=None, nocorrelation=False, weights=None, adjust=1.):
+def fastkde(x, y, gridsize=(200, 200), extents=None, nocorrelation=False,
+            weights=None, adjust=1.):
     """
     A fft-based Gaussian kernel density estimate (KDE)
     for computing the KDE on a regular grid
@@ -33,38 +34,36 @@ def fastkde(x, y, gridsize=(200, 200), extents=None, nocorrelation=False, weight
     reflection condition. Hence the limits of the dataset does not affect the
     pdf estimate.
 
-    INPUTS
-    ------
+    Parameters
+    ----------
+    x, y:  ndarray[ndim=1]
+        The x-coords, y-coords of the input data points respectively
 
-        x, y:  ndarray[ndim=1]
-            The x-coords, y-coords of the input data points respectively
+    gridsize: tuple
+        A (nx,ny) tuple of the size of the output grid (default: 200x200)
 
-        gridsize: tuple
-            A (nx,ny) tuple of the size of the output grid (default: 200x200)
+    extents: (xmin, xmax, ymin, ymax) tuple
+        tuple of the extents of output grid (default: extent of input data)
 
-        extents: (xmin, xmax, ymin, ymax) tuple
-            tuple of the extents of output grid (default: extent of input data)
+    nocorrelation: bool
+        If True, the correlation between the x and y coords will be ignored
+        when preforming the KDE. (default: False)
 
-        nocorrelation: bool
-            If True, the correlation between the x and y coords will be ignored
-            when preforming the KDE. (default: False)
+    weights: ndarray[ndim=1]
+        An array of the same shape as x & y that weights each sample (x_i,
+        y_i) by each value in weights (w_i).  Defaults to an array of ones
+        the same size as x & y. (default: None)
 
-        weights: ndarray[ndim=1]
-            An array of the same shape as x & y that weights each sample (x_i,
-            y_i) by each value in weights (w_i).  Defaults to an array of ones
-            the same size as x & y. (default: None)
+    adjust : float
+        An adjustment factor for the bw. Bandwidth becomes bw * adjust.
 
-        adjust : float
-            An adjustment factor for the bw. Bandwidth becomes bw * adjust.
-
-    OUTPUTS
+    Returns
     -------
-        g: ndarray[ndim=2]
-            A gridded 2D kernel density estimate of the input points.
+    g: ndarray[ndim=2]
+        A gridded 2D kernel density estimate of the input points.
 
-        e: (xmin, xmax, ymin, ymax) tuple
-            Extents of g
-
+    e: (xmin, xmax, ymin, ymax) tuple
+        Extents of g
     """
     # Variable check
     x, y = np.asarray(x), np.asarray(y)
@@ -84,7 +83,7 @@ def fastkde(x, y, gridsize=(200, 200), extents=None, nocorrelation=False, weight
             raise ValueError('Input weights must be an array of the same size as input x & y arrays!')
 
     # Optimize gridsize ------------------------------------------------------
-    #Make grid and discretize the data and round it to the next power of 2
+    # Make grid and discretize the data and round it to the next power of 2
     # to optimize with the fft usage
     if gridsize is None:
         gridsize = np.asarray([np.max((len(x), 512.)), np.max((len(y), 512.))])
@@ -104,7 +103,7 @@ def fastkde(x, y, gridsize=(200, 200), extents=None, nocorrelation=False, weight
 
     # Basically, this is just doing what np.digitize does with one less copy
     # xyi contains the bins of each point as a 2d array [(xi,yi)]
-    xyi = np.vstack((x,y)).T
+    xyi = np.vstack((x, y)).T
     xyi -= [xmin, ymin]
     xyi /= [dx, dy]
     xyi = np.floor(xyi, xyi).T
@@ -112,15 +111,15 @@ def fastkde(x, y, gridsize=(200, 200), extents=None, nocorrelation=False, weight
     # Next, make a 2D histogram of x & y.
     # Exploit a sparse coo_matrix avoiding np.histogram2d due to excessive
     # memory usage with many points
-    grid = coo_matrix((weights, xyi), shape=(nx, ny)).toarray()
+    grid = coo_matrix((weights, xyi), shape=(int(nx), int(ny))).toarray()
 
     # Kernel Preliminary Calculations ---------------------------------------
     # Calculate the covariance matrix (in pixel coords)
     cov = np.cov(xyi)
 
     if nocorrelation:
-        cov[1,0] = 0
-        cov[0,1] = 0
+        cov[1, 0] = 0
+        cov[0, 1] = 0
 
     # Scaling factor for bandwidth
     scotts_factor = n ** (-1.0 / 6.) * adjust  # For 2D
@@ -145,9 +144,9 @@ def fastkde(x, y, gridsize=(200, 200), extents=None, nocorrelation=False, weight
     kernel = np.dot(inv_cov, kernel) * kernel
     kernel = np.sum(kernel, axis=0) / 2.0
     kernel = np.exp(-kernel)
-    kernel = kernel.reshape((kern_ny, kern_nx))
+    kernel = kernel.reshape((int(kern_ny), int(kern_nx)))
 
-    #---- Produce the kernel density estimate --------------------------------
+    # ---- Produce the kernel density estimate --------------------------------
 
     # Convolve the histogram with the gaussian kernel
     # use boundary=symm to correct for data boundaries in the kde
@@ -207,14 +206,15 @@ def fastkde1D(xin, gridsize=200, extents=None, weights=None, adjust=1.):
         %timeit npkde(x, xe)
         1 loops, best of 3: 11.8 s per loop
 
-        ~ 1e4 speed up!!! However gaussian_kde is not optimized for this application
+        ~ 1e4 speed up!!! However gaussian_kde is not optimized for this
+        application
 
     Boundary conditions on the data is corrected by using a symmetric /
     reflection condition. Hence the limits of the dataset does not affect the
     pdf estimate.
 
-    INPUTS
-    ------
+    Parameters
+    ----------
 
         xin:  ndarray[ndim=1]
             The x-coords, y-coords of the input data points respectively
@@ -227,12 +227,13 @@ def fastkde1D(xin, gridsize=200, extents=None, weights=None, adjust=1.):
 
         weights: ndarray[ndim=1]
             An array of the same shape as x that weights each sample x_i
-            by w_i.  Defaults to an array of ones the same size as x (default: None)
+            by w_i.  Defaults to an array of ones the same size as x
+            (default: None)
 
         adjust : float
             An adjustment factor for the bw. Bandwidth becomes bw * adjust.
 
-    OUTPUTS
+    Returns
     -------
         g: ndarray[ndim=2]
             A gridded 2D kernel density estimate of the input points.
@@ -249,7 +250,7 @@ def fastkde1D(xin, gridsize=200, extents=None, weights=None, adjust=1.):
         xmin, xmax = x.min(), x.max()
     else:
         xmin, xmax = map(float, extents)
-        x = x[ (x <= xmax) & (x >= xmin) ]
+        x = x[(x <= xmax) & (x >= xmin)]
 
     n = x.size
 
@@ -262,13 +263,13 @@ def fastkde1D(xin, gridsize=200, extents=None, weights=None, adjust=1.):
             raise ValueError('Input weights must be an array of the same size as input x & y arrays!')
 
     # Optimize gridsize ------------------------------------------------------
-    #Make grid and discretize the data and round it to the next power of 2
+    # Make grid and discretize the data and round it to the next power of 2
     # to optimize with the fft usage
     if gridsize is None:
         gridsize = np.max((len(x), 512.))
     gridsize = 2 ** np.ceil(np.log2(gridsize))  # round to next power of 2
 
-    nx = gridsize
+    nx = int(gridsize)
 
     # Make the sparse 2d-histogram -------------------------------------------
     dx = (xmax - xmin) / (nx - 1)
@@ -283,7 +284,7 @@ def fastkde1D(xin, gridsize=200, extents=None, weights=None, adjust=1.):
     # Next, make a 2D histogram of x & y.
     # Exploit a sparse coo_matrix avoiding np.histogram2d due to excessive
     # memory usage with many points
-    grid = coo_matrix((weights, xyi), shape=(nx, 1)).toarray()
+    grid = coo_matrix((weights, xyi), shape=(int(nx), 1)).toarray()
 
     # Kernel Preliminary Calculations ---------------------------------------
     std_x = np.std(xyi[0])
@@ -291,23 +292,23 @@ def fastkde1D(xin, gridsize=200, extents=None, weights=None, adjust=1.):
     # Scaling factor for bandwidth
     scotts_factor = n ** (-1. / 5.) * adjust  # For n ** (-1. / (d + 4))
 
-    #Silvermann n * (d + 2) / 4.)**(-1. / (d + 4)).
+    # Silvermann n * (d + 2) / 4.)**(-1. / (d + 4)).
 
     # Make the gaussian kernel ---------------------------------------------
 
     # First, determine the bandwidth using Scott's rule
     # (note that Silvermann's rule gives the # same value for 2d datasets)
-    kern_nx = np.round(scotts_factor * 2 * np.pi * std_x)
+    kern_nx = int(np.round(scotts_factor * 2 * np.pi * std_x))
 
     # Then evaluate the gaussian function on the kernel grid
     kernel = np.reshape(gaussian(kern_nx, scotts_factor * std_x), (kern_nx, 1))
 
-    #---- Produce the kernel density estimate --------------------------------
+    # ---- Produce the kernel density estimate --------------------------------
 
     # Convolve the histogram with the gaussian kernel
     # use symmetric padding to correct for data boundaries in the kde
     npad = np.min((nx, 2 * kern_nx))
-    grid = np.vstack( [grid[npad: 0: -1], grid, grid[nx: nx - npad: -1]] )
+    grid = np.vstack([grid[npad: 0: -1], grid, grid[nx: nx - npad: -1]])
     grid = convolve(grid, kernel, mode='same')[npad: npad + nx]
 
     # Normalization factor to divide result by so that units are in the same
