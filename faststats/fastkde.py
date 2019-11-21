@@ -128,7 +128,7 @@ def fastkde(x, y, gridsize=(200, 200), extents=None, nocorrelation=False,
 
     # First, determine the bandwidth using Scott's rule
     # (note that Silvermann's rule gives the # same value for 2d datasets)
-    std_devs = np.diag(np.sqrt(cov))
+    std_devs = np.sqrt(np.diag(cov))
     kern_nx, kern_ny = np.round(scotts_factor * 2 * np.pi * std_devs)
 
     # Determine the bandwidth to use for the gaussian kernel
