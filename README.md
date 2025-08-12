@@ -1,4 +1,4 @@
-FASTSTATS - fast algorithm to do statistics
+FASTSTATS - fast algorithms to do statistics
 ===========================================
 
 
@@ -7,17 +7,10 @@ data.  Functions are typically **several orders of magnitude faster**, or so
 they claim.
 
 
-I recently discovered how slow certain algorithms in numpy/scipy could be very
-robust but very slow because they have to handle many tests and dimensions and
-multipurpose usage and so on. They are _most_ legit implementation decisions.
-However when you deal with tons of data, say 10^7 points in a 10 or 20
-dimensions, the slightest overhead could end up overloading your computer and
-potentially crash your system.
+I recently discovered how slow specific algorithms in numpy/scipy could be very robust but also very slow, because they have to handle many tests and dimensions and multipurpose usage and so on. They are _most_ legit implementation decisions. However, when you deal with tons of data, say 10^7 points in a 10 or 20 dimensions, the slightest overhead could end up overloading your computer and potentially crash your system.
 
-**Note**: algorithms in this package as usage targeted. This is how we can speed
+**Note**: algorithms in this package are targeted for specific usage. This is how we can speed
 up the algorithms.
-
-API documentation: [here](http://mfouesneau.github.io/faststats/index.html)
 
 Quick example
 -------------
@@ -40,5 +33,5 @@ xe = np.linspace(0., 1., 256)
 1 loops, best of 3: 11.8 s per loop
 ```
 
-The result is a **~ 10 ^ 4 speed up** !!! Results are identical
+The result is a **~ 10^4 speed up** !!! Results are identical
 Note that ``gaussian_kde`` is not optimized for this specific application. 
